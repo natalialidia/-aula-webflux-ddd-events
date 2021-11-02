@@ -15,18 +15,18 @@ class RouteController(
 ) {
 
     @PostMapping
-    fun addRoute(@RequestBody route: Route) {
-        routeRepository.save(route)
+    fun addRoute(@RequestBody route: Route): Mono<Route> {
+        return routeRepository.save(route)
     }
 
     @PutMapping
-    fun updateRoute(@RequestBody route: Route) {
-        routeRepository.save(route)
+    fun updateRoute(@RequestBody route: Route): Mono<Route> {
+        return routeRepository.save(route)
     }
 
     @DeleteMapping
     fun deleteRoute(@RequestBody route: Route) {
-        routeRepository.delete(route)
+        routeRepository.delete(route).subscribe()
     }
 
     @GetMapping
