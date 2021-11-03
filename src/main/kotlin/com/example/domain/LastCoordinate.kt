@@ -15,7 +15,7 @@ data class LastCoordinate(
         val routeId: Int
 )
 
-// fun createLastCoordinate(equipmentId: Int, latitude: Double, longitude: Double, route: Route): LastCoordinate {
-//         val equipment = Equipment(id = equipmentId)
-//         return LastCoordinate(null, equipment, latitude,longitude, Date(), route)
-// }
+fun createLastCoordinate(equipmentId: Int, latitude: Double, longitude: Double, routeId: Int): LastCoordinate {
+        val equipment = Equipment(id = equipmentId)
+        return LastCoordinate(null, equipment, latitude,longitude, Date(), routeId)
+}
