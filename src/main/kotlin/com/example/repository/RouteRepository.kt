@@ -1,13 +1,12 @@
 package com.example.repository
 
 import com.example.domain.Route
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository
+import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
-import reactor.core.publisher.Mono
 
 @Repository
-interface RouteRepository: ReactiveMongoRepository<Route, Int> {
+interface RouteRepository: CoroutineCrudRepository<Route, Int> {
 
-    fun getRouteByEquipment_Id(id: Int): Mono<Route>
+    suspend fun getRouteByEquipment_Id(id: Int): Route?
 
 }

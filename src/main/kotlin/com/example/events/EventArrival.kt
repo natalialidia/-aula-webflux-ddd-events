@@ -27,33 +27,29 @@ class EventArrival(
      * 1. esta dentro do raio de atendimento e
      * 2. se essa e a coordenada anterior são iguais
      */
-    override fun processCoordinate(notificationDto: NotificationDto) {
+    override suspend fun processCoordinate(notificationDto: NotificationDto) {
         val lastCoordinate = notificationDto.lastCoordinate
         val coordinate = notificationDto.coordinate
+
         if (lastCoordinate.latitude == coordinate.latitude && lastCoordinate.longitude == coordinate.longitude) {
 
-            routeRepository.getRouteByEquipment_Id(notificationDto.coordinate.equipmentId)
-                    .map { route -> Pair(filterListStops(coordinate, route.stops).toFlux(), route) }
-                    .flatMap { pair ->
-                        pair.first.flatMap { stop ->
-                            addArrivedStopOnRoute(pair.second, stop)
-                                    .flatMap {
-                                        registerEvent(EventType.ARRIVE, stop.id)
-                                    }
-                        }.then()
-
-                    }.subscribe()
-
+            val route = routeRepository.getRouteByEquipment_Id(notificationDto.coordinate.equipmentId)
+            if (route != null) {
+                filterListStops(coordinate, route.stops).forEach { stop ->
+                    addArrivedStopOnRoute(route, stop)
+                    registerEvent(EventType.ARRIVE, stop.id)
+                }
+            }
         }
     }
 
-    private fun registerEvent(eventType: EventType, stopId: Int): Mono<Event> {
+    private suspend fun registerEvent(eventType: EventType, stopId: Int): Event {
         val newEvent = Event(eventType = eventType, `when` = Date(), stopId = stopId)
         log.info("A new Arrive event launch {}", newEvent)
         return eventRepository.save(newEvent)
     }
 
-    private fun addArrivedStopOnRoute(route: Route, oldStop: Stop): Mono<Route> {
+    private suspend fun addArrivedStopOnRoute(route: Route, oldStop: Stop): Route {
         val updatedStop = oldStop.copy(arrivalAt = Date())
         val locationOfStop = route.stops.indexOf(oldStop)
         route.stops.removeAt(locationOfStop)
